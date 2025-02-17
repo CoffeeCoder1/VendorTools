@@ -4,24 +4,43 @@ import java.io.File;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.Task;
 import org.gradle.api.file.Directory;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
+import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
 
 public abstract class VendorToolsPlugin implements Plugin<Project> {
+	/**
+	 * The group for the build tasks created by this plugin.
+	 */
+	public static final String BUILD_TASK_GROUP = "Build";
+
 	@Override
 	public void apply(Project project) {
+		// Plugin dependencies
 		project.getPluginManager().apply(JavaPlugin.class);
 		project.getPluginManager().apply(MavenPublishPlugin.class);
 
-		project.setProperty("licenseFile", project.files(String.format("%s/LICENSE.md", project.getRootDir())));
+		// Extension dependencies
+		PublishingExtension publishingExtension = project.getExtensions().getByType(PublishingExtension.class);
+		JavaPluginExtension javaPluginExtension = project.getExtensions().findByType(JavaPluginExtension.class);
+
+		// Task dependencies
+		Task buildTask = project.getTasks().getByName("build");
+		Javadoc javadocTask = project.getTasks().withType(Javadoc.class).getByName("javadoc");
+		Task classesTask = project.getTasks().getByName("classes");
+
+		// Project info
 		Directory buildDir = project.getLayout().getBuildDirectory().get();
+		SourceSet mainSourceSet = javaPluginExtension.getSourceSets().getByName("main");
+
+		project.setProperty("licenseFile", project.files(String.format("%s/LICENSE.md", project.getRootDir())));
 
 		// Vendordep configuration
 		String releaseVersion = System.getenv("releaseVersion");
@@ -50,118 +69,100 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		String javaBaseName = String.format("_GROUP_%s_ID_%s-java_CLS", baseNameGroupId, baseArtifactId);
 
 		// Version output
-		project.getTasks().register("outputVersions", OutputVersionsTask.class, t -> {
-			t.getVersion().set(pubVersion);
-			t.getVersionFile().set(versionFile);
+		project.getTasks().register("outputVersions", OutputVersionsTask.class, task -> {
+			task.getVersion().set(pubVersion);
+			task.getVersionFile().set(versionFile);
 		});
-		project.getTasks().getByName("build").dependsOn("outputVersions");
+		buildTask.dependsOn("outputVersions");
 
 		// All outputs task
-		project.getTasks().register("copyAllOutputs", CopyAllOutputsTask.class, t -> {
-			t.getInputFiles().from(versionFile);
-			t.getOutputsFolder().set(allOutputsFolder);
-		});
-		project.getTasks().getByName("copyAllOutputs").dependsOn("outputVersions");
-		project.getTasks().getByName("build").dependsOn("copyAllOutputs");
+		CopyAllOutputsTask copyAllOutputsTask = project.getTasks().register("copyAllOutputs", CopyAllOutputsTask.class, task -> {
+			task.getInputFiles().from(versionFile);
+			task.getOutputsFolder().set(allOutputsFolder);
+		}).get();
+		copyAllOutputsTask.dependsOn("outputVersions");
+		buildTask.dependsOn("copyAllOutputs");
 
 		// Jar tasks
-		project.getTasks().register("sourcesJar", Jar.class, t -> {
-			t.setDescription("Assembles a Jar archive containing the main source.");
-			t.setGroup("Build");
+		Jar jarTask = project.getTasks().withType(Jar.class).getByName("jar");
 
-			t.getArchiveClassifier().set("sources");
-			t.from(project.getExtensions()
-					.findByType(JavaPluginExtension.class)
-					.getSourceSets()
-					.getByName("main")
-					.getAllSource());
-			t.dependsOn(project.getTasks().getByName("classes"));
-		});
+		Jar sourcesJarTask = project.getTasks().register("sourcesJar", Jar.class, task -> {
+			task.setDescription("Assembles a Jar archive containing the main source.");
+			task.setGroup(BUILD_TASK_GROUP);
 
-		project.getTasks().register("javadocJar", Jar.class, t -> {
-			t.setDescription("Assembles a Jar archive containing the main Javadoc.");
-			t.setGroup("Build");
+			task.getArchiveClassifier().set("sources");
+			task.from(mainSourceSet.getAllSource());
+			task.dependsOn(classesTask);
+		}).get();
 
-			t.getArchiveClassifier().set("javadoc");
-			t.from(project.getTasks()
-					.withType(Javadoc.class)
-					.getByName("javadoc")
-					.getDestinationDir());
-			t.dependsOn(project.getTasks().getByName("javadoc"));
-		});
+		Jar javadocJarTask = project.getTasks().register("javadocJar", Jar.class, task -> {
+			task.setDescription("Assembles a Jar archive containing the main Javadoc.");
+			task.setGroup(BUILD_TASK_GROUP);
 
-		project.getTasks().register("outputJar", Jar.class, t -> {
-			t.setDescription("Assembles a Jar archive containing the main output.");
-			t.setGroup("Build");
+			task.getArchiveClassifier().set("javadoc");
+			task.from(javadocTask.getDestinationDir());
+			task.dependsOn(javadocTask);
+		}).get();
 
-			t.getArchiveBaseName().set(javaBaseName);
-			t.getDestinationDirectory().set(outputsFolder);
-			t.from(project.getExtensions()
-					.findByType(JavaPluginExtension.class)
-					.getSourceSets()
-					.getByName("main")
-					.getOutput());
-			t.dependsOn(project.getTasks().getByName("classes"));
-		});
+		Jar outputJarTask = project.getTasks().register("outputJar", Jar.class, task -> {
+			task.setDescription("Assembles a Jar archive containing the main output.");
+			task.setGroup(BUILD_TASK_GROUP);
 
-		project.getTasks().register("outputSourcesJar", Jar.class, t -> {
-			t.setDescription("Assembles a Jar archive containing the main output sources.");
-			t.setGroup("Build");
+			task.getArchiveBaseName().set(javaBaseName);
+			task.getDestinationDirectory().set(outputsFolder);
+			task.from(mainSourceSet.getOutput());
+			task.dependsOn(classesTask);
+		}).get();
 
-			t.getArchiveBaseName().set(javaBaseName);
-			t.getArchiveClassifier().set("sources");
-			t.getDestinationDirectory().set(outputsFolder);
-			t.from(project.getExtensions()
-					.findByType(JavaPluginExtension.class)
-					.getSourceSets()
-					.getByName("main")
-					.getAllSource());
-			t.dependsOn(project.getTasks().getByName("classes"));
-		});
+		Jar outputSourcesJarTask = project.getTasks().register("outputSourcesJar", Jar.class, task -> {
+			task.setDescription("Assembles a Jar archive containing the main output sources.");
+			task.setGroup(BUILD_TASK_GROUP);
 
-		project.getTasks().register("outputJavadocJar", Jar.class, t -> {
-			t.setDescription("Assembles a Jar archive containing the main output Javadoc.");
-			t.setGroup("Build");
+			task.getArchiveBaseName().set(javaBaseName);
+			task.getArchiveClassifier().set("sources");
+			task.getDestinationDirectory().set(outputsFolder);
+			task.from(mainSourceSet.getAllSource());
+			task.dependsOn(classesTask);
+		}).get();
 
-			t.getArchiveBaseName().set(javaBaseName);
-			t.getArchiveClassifier().set("javadoc");
-			t.getDestinationDirectory().set(outputsFolder);
-			t.from(project.getTasks()
-					.withType(Javadoc.class)
-					.getByName("javadoc")
-					.getDestinationDir());
-			t.dependsOn(project.getTasks().getByName("classes"));
-		});
+		Jar outputJavadocJarTask = project.getTasks().register("outputJavadocJar", Jar.class, task -> {
+			task.setDescription("Assembles a Jar archive containing the main output Javadoc.");
+			task.setGroup(BUILD_TASK_GROUP);
 
-		project.getTasks().register("vendordepJson", VendordepJsonTask.class, t -> {
-			t.getVendordepFile().set(vendordepFile);
-			t.getOutputsFolder().set(outputsFolder);
-			t.getValueMap().put("version", pubVersion);
-			t.getValueMap().put("groupId", artifactGroupId);
-			t.getValueMap().put("artifactId", baseArtifactId);
+			task.getArchiveBaseName().set(javaBaseName);
+			task.getArchiveClassifier().set("javadoc");
+			task.getDestinationDirectory().set(outputsFolder);
+			task.from(javadocTask.getDestinationDir());
+			task.dependsOn(classesTask);
+		}).get();
+
+		project.getTasks().register("vendordepJson", VendordepJsonTask.class, task -> {
+			task.getVendordepFile().set(vendordepFile);
+			task.getOutputsFolder().set(outputsFolder);
+			task.getValueMap().put("version", pubVersion);
+			task.getValueMap().put("groupId", artifactGroupId);
+			task.getValueMap().put("artifactId", baseArtifactId);
 		});
 
 		// Build artifacts
-		project.getArtifacts().add("archives", project.getTasks().getByName("sourcesJar"));
-		project.getArtifacts().add("archives", project.getTasks().getByName("javadocJar"));
-		project.getArtifacts().add("archives", project.getTasks().getByName("outputJar"));
-		project.getArtifacts().add("archives", project.getTasks().getByName("outputSourcesJar"));
-		project.getArtifacts().add("archives", project.getTasks().getByName("outputJavadocJar"));
+		project.getArtifacts().add("archives", sourcesJarTask);
+		project.getArtifacts().add("archives", javadocJarTask);
+		project.getArtifacts().add("archives", outputJarTask);
+		project.getArtifacts().add("archives", outputSourcesJarTask);
+		project.getArtifacts().add("archives", outputJavadocJarTask);
 
 		// Build outputs
-		project.getTasks().withType(CopyAllOutputsTask.class).all((task) -> task.addTask(project.getTasks().getByName("outputSourcesJar")));
-		project.getTasks().withType(CopyAllOutputsTask.class).all((task) -> task.addTask(project.getTasks().getByName("outputJavadocJar")));
-		project.getTasks().withType(CopyAllOutputsTask.class).all((task) -> task.addTask(project.getTasks().getByName("outputJar")));
+		copyAllOutputsTask.addTask(outputSourcesJarTask);
+		copyAllOutputsTask.addTask(outputJavadocJarTask);
+		copyAllOutputsTask.addTask(outputJarTask);
 
 		// Build task dependencies
-		project.getTasks().getByName("build").dependsOn("outputSourcesJar");
-		project.getTasks().getByName("build").dependsOn("outputJavadocJar");
-		project.getTasks().getByName("build").dependsOn("outputJar");
+		buildTask.dependsOn("outputSourcesJar");
+		buildTask.dependsOn("outputJavadocJar");
+		buildTask.dependsOn("outputJar");
 
 		// Maven repository
-		project.getExtensions()
-				.getByType(PublishingExtension.class)
-				.getRepositories()
+		publishingExtension.getRepositories()
 				.maven((repository) -> {
 					repository.setUrl(releasesRepoUrl);
 				});
@@ -171,13 +172,10 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		// }
 
 		// Publications
-		MavenPublication javaPublication = project.getExtensions()
-				.getByType(PublishingExtension.class)
-				.getPublications()
-				.create("java", MavenPublication.class);
-		javaPublication.artifact(project.getTasks().getByName("jar"));
-		javaPublication.artifact(project.getTasks().getByName("sourcesJar"));
-		javaPublication.artifact(project.getTasks().getByName("javadocJar"));
+		MavenPublication javaPublication = publishingExtension.getPublications().create("java", MavenPublication.class);
+		javaPublication.artifact(jarTask);
+		javaPublication.artifact(sourcesJarTask);
+		javaPublication.artifact(javadocJarTask);
 		javaPublication.setArtifactId(String.format("%s-java", baseArtifactId));
 		javaPublication.setGroupId(artifactGroupId);
 		javaPublication.setVersion(pubVersion);

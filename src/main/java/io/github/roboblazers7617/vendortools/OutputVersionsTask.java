@@ -13,8 +13,17 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
+/**
+ * Prints the versions of WPILib to a file for later use when publishing.
+ */
 public abstract class OutputVersionsTask extends DefaultTask {
+	/**
+	 * The project version to write to the file.
+	 */
 	private final Property<String> version;
+	/**
+	 * The file to output to.
+	 */
 	private final RegularFileProperty versionFile;
 
 	@Inject

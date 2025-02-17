@@ -15,9 +15,21 @@ import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.provider.MapProperty;
 
+/**
+ * Replaces template variables in a Vendordep JSON file and writes it to the outputs folder.
+ */
 public abstract class VendordepJsonTask extends DefaultTask {
+	/**
+	 * The Vendordep JSON file to read.
+	 */
 	private final RegularFileProperty vendordepFile;
+	/**
+	 * The directory to output to.
+	 */
 	private final DirectoryProperty outputsFolder;
+	/**
+	 * The values to substitue into the file.
+	 */
 	private final MapProperty<String, String> valueMap;
 
 	@Inject

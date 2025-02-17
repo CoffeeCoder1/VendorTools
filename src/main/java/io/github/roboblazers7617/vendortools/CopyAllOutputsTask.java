@@ -13,8 +13,17 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
+/**
+ * Copies the outputs from a set of tasks into a single directory.
+ */
 public abstract class CopyAllOutputsTask extends DefaultTask {
+	/**
+	 * The input files to copy.
+	 */
 	private final ConfigurableFileCollection inputFiles;
+	/**
+	 * The directory to copy into.
+	 */
 	private final DirectoryProperty outputsFolder;
 
 	@Inject
@@ -33,6 +42,12 @@ public abstract class CopyAllOutputsTask extends DefaultTask {
 		return outputsFolder;
 	}
 
+	/**
+	 * Adds a task's outputs to the all outputs task. Reads the task's archiveFile property and adds it to the {@link #inputFiles}.
+	 *
+	 * @param task
+	 *            Task to add.
+	 */
 	public void addTask(Task task) {
 		dependsOn(task);
 		inputFiles.from(task.property("archiveFile"));
