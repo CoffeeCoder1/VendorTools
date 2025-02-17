@@ -6,6 +6,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.Directory;
+import org.gradle.api.plugins.ExtraPropertiesExtension;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.publish.PublishingExtension;
@@ -30,6 +31,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		// Extension dependencies
 		PublishingExtension publishingExtension = project.getExtensions().getByType(PublishingExtension.class);
 		JavaPluginExtension javaPluginExtension = project.getExtensions().findByType(JavaPluginExtension.class);
+		ExtraPropertiesExtension extraPropertiesExtension = project.getExtensions().findByType(ExtraPropertiesExtension.class);
 
 		// Task dependencies
 		Task buildTask = project.getTasks().getByName("build");
@@ -40,7 +42,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		Directory buildDir = project.getLayout().getBuildDirectory().get();
 		SourceSet mainSourceSet = javaPluginExtension.getSourceSets().getByName("main");
 
-		project.setProperty("licenseFile", project.files(String.format("%s/LICENSE.md", project.getRootDir())));
+		extraPropertiesExtension.set("licenseFile", project.files(String.format("%s/LICENSE.md", project.getRootDir())));
 
 		// Vendordep configuration
 		String releaseVersion = System.getenv("releaseVersion");
