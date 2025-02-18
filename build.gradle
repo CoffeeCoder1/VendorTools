@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'net.apollofops'
-version = '2025.0.0'
+version = '2025.0.1-SNAPSHOT'
 
 gradlePlugin {
 	website = 'https://coffeecoder1.github.io/VendorTools/'
