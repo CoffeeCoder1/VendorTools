@@ -3,21 +3,21 @@ plugins {
 	id('com.gradle.plugin-publish') version "1.3.1"
 }
 
-group = 'io.github.roboblazers7617'
+group = 'net.apollofops'
 version = '0.0.0-SNAPSHOT'
 
 gradlePlugin {
-	//website = 'https://github.com/roboblazers7617/VendorTools'
-    //vcsUrl = 'https://github.com/roboblazers7617/VendorTools'
-    plugins {
-        vendorTools {
-            id = 'io.github.roboblazers7617.VendorTools'
-			//displayName = 'VendorTools'
-            implementationClass = 'io.github.roboblazers7617.vendortools.VendorToolsPlugin'
-			//description = 'A better build system for WPILib Vendor dependencies.'
-			//tags = ['frc', 'wpilib', 'gradlerio', 'vendordep']
-        }
-    }
+	website = 'https://github.com/CoffeeCoder1/VendorTools'
+	vcsUrl = 'https://github.com/CoffeeCoder1/VendorTools'
+	plugins {
+		vendorTools {
+			id = 'net.apollofops.VendorTools'
+			displayName = 'VendorTools'
+			implementationClass = 'net.apollofops.vendortools.VendorToolsPlugin'
+			description = 'A better build system for WPILib Vendor dependencies.'
+			tags = ['frc', 'wpilib', 'gradlerio', 'vendordep']
+		}
+	}
 }
 
 publishing {

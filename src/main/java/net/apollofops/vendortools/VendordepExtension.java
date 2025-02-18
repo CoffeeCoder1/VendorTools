@@ -1,4 +1,4 @@
-package io.github.roboblazers7617.vendortools;
+package net.apollofops.vendortools;
 
 import javax.inject.Inject;
 
