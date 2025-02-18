@@ -129,7 +129,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			task.getArchiveClassifier().set("javadoc");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(javadocTask.getDestinationDir());
-			task.dependsOn(classesTask);
+			task.dependsOn(javadocTask);
 		}).get();
 
 		project.getTasks().register("vendordepJson", VendordepJsonTask.class, task -> {
