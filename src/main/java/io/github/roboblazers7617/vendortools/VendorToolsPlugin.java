@@ -24,6 +24,9 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 
 	@Override
 	public void apply(Project project) {
+		// Plugin extension
+		VendordepExtension vendordepExtension = project.getExtensions().create("vendordep", VendordepExtension.class, project);
+
 		// Plugin dependencies
 		project.getPluginManager().apply(JavaPlugin.class);
 		project.getPluginManager().apply(MavenPublishPlugin.class);
@@ -46,29 +49,24 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 
 		// Vendordep configuration
 		String releaseVersion = System.getenv("releaseVersion");
-		String pubVersion;
+		final String pubVersion;
 		if (releaseVersion == null) {
 			pubVersion = "test";
 		} else {
 			pubVersion = releaseVersion;
 		}
 
-		String repoUrl = System.getenv("mavenRepo");
-		if (repoUrl == null) {
+		String mavenRepo = System.getenv("mavenRepo");
+		final String repoUrl;
+		if (mavenRepo == null) {
 			repoUrl = String.format("%s/repos", project.getRootDir());
+		} else {
+			repoUrl = mavenRepo;
 		}
 
-		String releasesRepoUrl = String.format("%s/%s", repoUrl, project.property("vendordepPublish.releasesRepoName"));
 		File outputsFolder = project.file(String.format("%s/outputs", buildDir));
 		File allOutputsFolder = project.file(String.format("%s/allOutputs", buildDir));
 		File versionFile = project.file(String.format("%s/version.txt", outputsFolder));
-		File vendordepFile = project.file(project.property("vendordepPublish.vendordepFileName"));
-
-		// Repo artifact configuration
-		String artifactGroupId = (String) project.property("vendordepPublish.artifactGroupId");
-		String baseArtifactId = (String) project.property("vendordepPublish.baseArtifactId");
-		String baseNameGroupId = artifactGroupId.replace(".", "_");
-		String javaBaseName = String.format("_GROUP_%s_ID_%s-java_CLS", baseNameGroupId, baseArtifactId);
 
 		// Version output
 		project.getTasks().register("outputVersions", OutputVersionsTask.class, task -> {
@@ -110,7 +108,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			task.setDescription("Assembles a Jar archive containing the main output.");
 			task.setGroup(BUILD_TASK_GROUP);
 
-			task.getArchiveBaseName().set(javaBaseName);
+			task.getArchiveBaseName().set(vendordepExtension.getJavaBaseName());
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(mainSourceSet.getOutput());
 			task.dependsOn(classesTask);
@@ -120,7 +118,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			task.setDescription("Assembles a Jar archive containing the main output sources.");
 			task.setGroup(BUILD_TASK_GROUP);
 
-			task.getArchiveBaseName().set(javaBaseName);
+			task.getArchiveBaseName().set(vendordepExtension.getJavaBaseName());
 			task.getArchiveClassifier().set("sources");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(mainSourceSet.getAllSource());
@@ -131,7 +129,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			task.setDescription("Assembles a Jar archive containing the main output Javadoc.");
 			task.setGroup(BUILD_TASK_GROUP);
 
-			task.getArchiveBaseName().set(javaBaseName);
+			task.getArchiveBaseName().set(vendordepExtension.getJavaBaseName());
 			task.getArchiveClassifier().set("javadoc");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(javadocTask.getDestinationDir());
@@ -139,11 +137,11 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		}).get();
 
 		project.getTasks().register("vendordepJson", VendordepJsonTask.class, task -> {
-			task.getVendordepFile().set(vendordepFile);
+			task.getVendordepFile().set(vendordepExtension.getVendordepJsonFile());
 			task.getOutputsFolder().set(outputsFolder);
 			task.getValueMap().put("version", pubVersion);
-			task.getValueMap().put("groupId", artifactGroupId);
-			task.getValueMap().put("artifactId", baseArtifactId);
+			task.getValueMap().put("groupId", vendordepExtension.getArtifactGroupId());
+			task.getValueMap().put("artifactId", vendordepExtension.getBaseArtifactId());
 		});
 
 		// Build artifacts
@@ -163,23 +161,25 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		buildTask.dependsOn("outputJavadocJar");
 		buildTask.dependsOn("outputJar");
 
-		// Maven repository
-		publishingExtension.getRepositories()
-				.maven((repository) -> {
-					repository.setUrl(releasesRepoUrl);
-				});
-
 		// clean {
 		// delete releasesRepoUrl
 		// }
 
-		// Publications
-		MavenPublication javaPublication = publishingExtension.getPublications().create("java", MavenPublication.class);
-		javaPublication.artifact(jarTask);
-		javaPublication.artifact(sourcesJarTask);
-		javaPublication.artifact(javadocJarTask);
-		javaPublication.setArtifactId(String.format("%s-java", baseArtifactId));
-		javaPublication.setGroupId(artifactGroupId);
-		javaPublication.setVersion(pubVersion);
+		project.afterEvaluate((ae) -> {
+			// Maven repository
+			publishingExtension.getRepositories()
+					.maven((repository) -> {
+						repository.setUrl(vendordepExtension.getReleasesRepoUrl(repoUrl));
+					});
+
+			// Publications
+			MavenPublication javaPublication = publishingExtension.getPublications().create("java", MavenPublication.class);
+			javaPublication.artifact(jarTask);
+			javaPublication.artifact(sourcesJarTask);
+			javaPublication.artifact(javadocJarTask);
+			javaPublication.setArtifactId(String.format("%s-java", vendordepExtension.getBaseArtifactId().get()));
+			javaPublication.setGroupId(vendordepExtension.getArtifactGroupId().get());
+			javaPublication.setVersion(pubVersion);
+		});
 	}
 }
