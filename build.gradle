@@ -7,7 +7,7 @@ group = 'net.apollofops'
 version = '2025.0.0'
 
 gradlePlugin {
-	website = 'https://github.com/CoffeeCoder1/VendorTools'
+	website = 'https://coffeecoder1.github.io/VendorTools/'
 	vcsUrl = 'https://github.com/CoffeeCoder1/VendorTools'
 	plugins {
 		vendorTools {
