@@ -1,4 +1,4 @@
-package net.apollofops.vendortools.java;
+package net.apollofops.first.vendortools.java;
 
 import java.io.File;
 
@@ -14,9 +14,9 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.javadoc.Javadoc;
 
-import net.apollofops.vendortools.CopyAllOutputsTask;
-import net.apollofops.vendortools.VendorToolsPlugin;
-import net.apollofops.vendortools.VendordepExtension;
+import net.apollofops.first.vendortools.CopyAllOutputsTask;
+import net.apollofops.first.vendortools.VendorToolsPlugin;
+import net.apollofops.first.vendortools.VendordepExtension;
 
 public class VendorToolsJavaPlugin implements Plugin<Project> {
 	@Override

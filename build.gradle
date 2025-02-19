@@ -4,16 +4,16 @@ plugins {
 }
 
 group = 'net.apollofops'
-version = '2025.0.1-SNAPSHOT'
+version = '2025.0.1'
 
 gradlePlugin {
 	website = 'https://coffeecoder1.github.io/VendorTools/'
 	vcsUrl = 'https://github.com/CoffeeCoder1/VendorTools'
 	plugins {
 		vendorTools {
-			id = 'net.apollofops.VendorTools'
+			id = 'net.apollofops.first.VendorTools'
 			displayName = 'VendorTools'
-			implementationClass = 'net.apollofops.vendortools.VendorToolsPlugin'
+			implementationClass = 'net.apollofops.first.vendortools.VendorToolsPlugin'
 			description = 'A better build system for WPILib Vendor dependencies.'
 			tags = ['frc', 'wpilib', 'gradlerio', 'vendordep']
 		}

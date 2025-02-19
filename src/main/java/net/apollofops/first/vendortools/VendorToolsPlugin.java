@@ -1,4 +1,4 @@
-package net.apollofops.vendortools;
+package net.apollofops.first.vendortools;
 
 import java.io.File;
 
@@ -9,7 +9,8 @@ import org.gradle.api.file.Directory;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 
-import net.apollofops.vendortools.java.VendorToolsJavaPlugin;
+import net.apollofops.first.vendortools.cpp.VendorToolsCppPlugin;
+import net.apollofops.first.vendortools.java.VendorToolsJavaPlugin;
 
 public abstract class VendorToolsPlugin implements Plugin<Project> {
 	/**
@@ -83,10 +84,15 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		// delete releasesRepoUrl
 		// }
 
-		// Library build plugins
-		project.getPluginManager().apply(VendorToolsJavaPlugin.class);
-
 		project.afterEvaluate((ae) -> {
+			// Library build plugins
+			if (vendordepExtension.getEnableJava().get()) {
+				project.getPluginManager().apply(VendorToolsJavaPlugin.class);
+			}
+			if (vendordepExtension.getEnableCpp().get()) {
+				project.getPluginManager().apply(VendorToolsCppPlugin.class);
+			}
+
 			// Maven repository
 			publishingExtension.getRepositories()
 					.maven((repository) -> {

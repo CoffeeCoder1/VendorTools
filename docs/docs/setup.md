@@ -21,7 +21,12 @@ Installing the plugin is as simple as adding it to your library's `plugins` bloc
 ```groovy
 plugins {
     ...
-	id 'net.apollofops.VendorTools' version "2025.0.0"
+	id 'net.apollofops.first.VendorTools' version "2025.0.0"
+}
+
+// For C++
+ext {
+	licenseFile = "$rootDir/LICENSE.md"
 }
 
 ...
@@ -31,6 +36,8 @@ vendordep {
 	artifactGroupId = "com.mycompany.mylibrary" // Group ID
 	vendordepJsonFile = file("MyLibrary.json") // JSON file to read from
 	releasesRepoName = "mylibrary" // Repo name (subdirectory of the Maven repository used by the Vendordep - allows for multiple Vendordeps to be put in the same repo but still be kept completely separate)
+	enableJava = true // Enables Java builds
+	enableCpp = true // Enables C++ builds
 }
 ```
 

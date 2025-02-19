@@ -1,4 +1,4 @@
-package net.apollofops.vendortools;
+package net.apollofops.first.vendortools;
 
 import javax.inject.Inject;
 
@@ -28,7 +28,15 @@ public class VendordepExtension {
 	 * The name of the repo to release to.
 	 */
 	private final Property<String> releasesRepoName;
+	private final Property<Boolean> enableJava;
+	private final Property<Boolean> enableCpp;
 
+	/**
+	 * Creates a new VendordepExtension.
+	 *
+	 * @param project
+	 *            The project to apply it to.
+	 */
 	@Inject
 	public VendordepExtension(Project project) {
 		ObjectFactory objects = project.getObjects();
@@ -37,6 +45,12 @@ public class VendordepExtension {
 		baseArtifactId = objects.property(String.class);
 		artifactGroupId = objects.property(String.class);
 		releasesRepoName = objects.property(String.class);
+		enableJava = objects.property(Boolean.class);
+		enableCpp = objects.property(Boolean.class);
+
+		// Defaults
+		enableJava.set(false);
+		enableCpp.set(false);
 	}
 
 	public RegularFileProperty getVendordepJsonFile() {
@@ -55,6 +69,20 @@ public class VendordepExtension {
 		return releasesRepoName;
 	}
 
+	public Property<Boolean> getEnableJava() {
+		return enableJava;
+	}
+
+	public Property<Boolean> getEnableCpp() {
+		return enableCpp;
+	}
+
+	/**
+	 * Gets the group ID used by the base name. This is the regular group ID, but with periods replaced with underscores.
+	 *
+	 * @return
+	 *         A string provider that provides the group ID.
+	 */
 	public Provider<String> getBaseNameGroupId() {
 		return artifactGroupId.map((groupId) -> groupId.replace(".", "_"));
 	}

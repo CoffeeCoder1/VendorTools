@@ -1,4 +1,4 @@
-package net.apollofops.vendortools;
+package net.apollofops.first.vendortools;
 
 import java.io.IOException;
 
