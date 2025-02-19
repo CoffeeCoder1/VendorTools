@@ -70,6 +70,15 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		copyAllOutputsTask.dependsOn("outputVersions");
 		buildTask.dependsOn("copyAllOutputs");
 
+		// Vendordep JSON templating
+		project.getTasks().register("vendordepJson", VendordepJsonTask.class, task -> {
+			task.getVendordepFile().set(vendordepExtension.getVendordepJsonFile());
+			task.getOutputsFolder().set(outputsFolder);
+			task.getValueMap().put("version", pubVersion);
+			task.getValueMap().put("groupId", vendordepExtension.getArtifactGroupId());
+			task.getValueMap().put("artifactId", vendordepExtension.getBaseArtifactId());
+		});
+
 		// clean {
 		// delete releasesRepoUrl
 		// }

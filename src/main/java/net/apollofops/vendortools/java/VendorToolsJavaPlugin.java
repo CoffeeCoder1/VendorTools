@@ -17,7 +17,6 @@ import org.gradle.api.tasks.javadoc.Javadoc;
 import net.apollofops.vendortools.CopyAllOutputsTask;
 import net.apollofops.vendortools.VendorToolsPlugin;
 import net.apollofops.vendortools.VendordepExtension;
-import net.apollofops.vendortools.VendordepJsonTask;
 
 public class VendorToolsJavaPlugin implements Plugin<Project> {
 	@Override
@@ -103,14 +102,6 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 			task.from(javadocTask.getDestinationDir());
 			task.dependsOn(javadocTask);
 		}).get();
-
-		project.getTasks().register("vendordepJson", VendordepJsonTask.class, task -> {
-			task.getVendordepFile().set(vendordepExtension.getVendordepJsonFile());
-			task.getOutputsFolder().set(outputsFolder);
-			task.getValueMap().put("version", pubVersion);
-			task.getValueMap().put("groupId", vendordepExtension.getArtifactGroupId());
-			task.getValueMap().put("artifactId", vendordepExtension.getBaseArtifactId());
-		});
 
 		// Build artifacts
 		project.getArtifacts().add("archives", sourcesJarTask);
