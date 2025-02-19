@@ -59,8 +59,16 @@ public class VendordepExtension {
 		return artifactGroupId.map((groupId) -> groupId.replace(".", "_"));
 	}
 
-	public Provider<String> getJavaBaseName() {
-		return getBaseNameGroupId().zip(baseArtifactId, (groupId, artifactId) -> String.format("_GROUP_%s_ID_%s-java_CLS", groupId, artifactId));
+	/**
+	 * Gets the base name to use for the artifacts.
+	 *
+	 * @param artifactClassifier
+	 *            The classifier string to use.
+	 * @return
+	 *         A string provider that provides the base name.
+	 */
+	public Provider<String> getBaseName(String artifactClassifier) {
+		return getBaseNameGroupId().zip(baseArtifactId, (groupId, artifactId) -> String.format("_GROUP_%s_ID_%s-%s_CLS", groupId, artifactId, artifactClassifier));
 	}
 
 	public Provider<String> getReleasesRepoUrl(String repoUrl) {

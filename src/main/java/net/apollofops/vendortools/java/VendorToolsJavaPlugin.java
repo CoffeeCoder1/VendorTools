@@ -75,7 +75,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 			task.setDescription("Assembles a Jar archive containing the main output.");
 			task.setGroup(VendorToolsPlugin.BUILD_TASK_GROUP);
 
-			task.getArchiveBaseName().set(vendordepExtension.getJavaBaseName());
+			task.getArchiveBaseName().set(vendordepExtension.getBaseName("java"));
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(mainSourceSet.getOutput());
 			task.dependsOn(classesTask);
@@ -85,7 +85,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 			task.setDescription("Assembles a Jar archive containing the main output sources.");
 			task.setGroup(VendorToolsPlugin.BUILD_TASK_GROUP);
 
-			task.getArchiveBaseName().set(vendordepExtension.getJavaBaseName());
+			task.getArchiveBaseName().set(vendordepExtension.getBaseName("java"));
 			task.getArchiveClassifier().set("sources");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(mainSourceSet.getAllSource());
@@ -96,7 +96,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 			task.setDescription("Assembles a Jar archive containing the main output Javadoc.");
 			task.setGroup(VendorToolsPlugin.BUILD_TASK_GROUP);
 
-			task.getArchiveBaseName().set(vendordepExtension.getJavaBaseName());
+			task.getArchiveBaseName().set(vendordepExtension.getBaseName("java"));
 			task.getArchiveClassifier().set("javadoc");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(javadocTask.getDestinationDir());
