@@ -64,5 +64,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: maven
+          name: publish-outputs-maven
           path: ~/releases
