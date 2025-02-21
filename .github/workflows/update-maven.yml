@@ -17,11 +17,16 @@ on:
         description: 'The client payload provided by the caller workflow.'
         required: true
         type: string
-  
+
+      github-app-id:
+        description: 'The app ID for the GitHub app used to authenticate with the GitHub API. Must have read access to the repository that you are downloading artifacts from.'
+        required: true
+        type: string
+
     secrets:
-      github-token:
-        description: 'The GitHub token used to authenticate with the GitHub API. Must have read access to the repository that you are downloading artifacts from.'
-        required: false
+      github-app-private-key:
+        description: 'The private key for the GitHub app used to authenticate with the GitHub API. Must have read access to the repository that you are downloading artifacts from.'
+        required: true
 
 jobs:
   update:
@@ -33,6 +38,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Generate an authentication token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ inputs.github-app-id }}
+          private-key: ${{ secrets.github-app-private-key }}
+          # Set the owner, so the token can be used in all repositories
+          owner: ${{ github.repository_owner }}
 
       - uses: ./.github/actions/publish
         with:
