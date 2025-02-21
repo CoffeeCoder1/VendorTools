@@ -36,7 +36,7 @@ public class VendorToolsCombinerPlugin implements Plugin<Project> {
 		Provider<String> pubVersion = project.getProviders()
 				.fileContents(project.getLayout()
 						.file(project.provider(() -> project.file(fileFinder.getFileNames(productsFolder.getAbsolutePath(), "**/allOutputs/version.txt")
-								.getFirst()))))
+								.get(0)))))
 				.getAsText()
 				.map((version) -> version.trim());
 
