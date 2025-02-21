@@ -25,17 +25,22 @@ public class VendordepExtension {
 	 */
 	private final Property<String> artifactGroupId;
 	/**
-	 * The name of the repo to release to.
+	 * The name of the maven repo to release to. Appended to the repo URL.
 	 */
 	private final Property<String> releasesRepoName;
+	/**
+	 * The URL of the maven repo to release to.
+	 */
+	private final Property<String> mavenRepoUrl;
 	private final Property<Boolean> enableJava;
 	private final Property<Boolean> enableCpp;
+	private final Property<Boolean> enableCombiner;
 
 	/**
 	 * Creates a new VendordepExtension.
 	 *
 	 * @param project
-	 *            The project to apply it to.
+	 *                The project to apply it to.
 	 */
 	@Inject
 	public VendordepExtension(Project project) {
@@ -47,10 +52,15 @@ public class VendordepExtension {
 		releasesRepoName = objects.property(String.class);
 		enableJava = objects.property(Boolean.class);
 		enableCpp = objects.property(Boolean.class);
+		mavenRepoUrl = objects.property(String.class);
+		enableCombiner = objects.property(Boolean.class);
 
 		// Defaults
 		enableJava.set(false);
 		enableCpp.set(false);
+		enableCombiner.set(false);
+		mavenRepoUrl.set(String.format("%s/repos", project.getRootDir()));
+		releasesRepoName.set(System.getenv("releasesRepoName"));
 	}
 
 	public RegularFileProperty getVendordepJsonFile() {
@@ -69,12 +79,20 @@ public class VendordepExtension {
 		return releasesRepoName;
 	}
 
+	public Property<String> getMavenRepoUrl() {
+		return mavenRepoUrl;
+	}
+
 	public Property<Boolean> getEnableJava() {
 		return enableJava;
 	}
 
 	public Property<Boolean> getEnableCpp() {
 		return enableCpp;
+	}
+
+	public Property<Boolean> getEnableCombiner() {
+		return enableCombiner;
 	}
 
 	/**
@@ -91,7 +109,7 @@ public class VendordepExtension {
 	 * Gets the base name to use for the artifacts.
 	 *
 	 * @param artifactClassifier
-	 *            The classifier string to use.
+	 *                The classifier string to use.
 	 * @return
 	 *         A string provider that provides the base name.
 	 */
@@ -99,7 +117,13 @@ public class VendordepExtension {
 		return getBaseNameGroupId().zip(baseArtifactId, (groupId, artifactId) -> String.format("_GROUP_%s_ID_%s-%s_CLS", groupId, artifactId, artifactClassifier));
 	}
 
-	public Provider<String> getReleasesRepoUrl(String repoUrl) {
-		return getReleasesRepoName().map((repoName) -> String.format("%s/%s", repoUrl, repoName));
+	/**
+	 * Gets the repo URL for the plugin based on the {@link #mavenRepoUrl} and {@link #releasesRepoName}.
+	 *
+	 * @return
+	 *         A string provider that provides the repo URL.
+	 */
+	public Provider<String> getReleasesRepoUrl() {
+		return getReleasesRepoName().zip(mavenRepoUrl, (repoName, repoUrl) -> String.format("%s/%s", repoUrl, repoName));
 	}
 }

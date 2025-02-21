@@ -11,6 +11,7 @@ import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 
 import net.apollofops.first.vendortools.cpp.VendorToolsCppPlugin;
 import net.apollofops.first.vendortools.java.VendorToolsJavaPlugin;
+import net.apollofops.first.vendortools.combiner.VendorToolsCombinerPlugin;
 
 public abstract class VendorToolsPlugin implements Plugin<Project> {
 	/**
@@ -42,14 +43,6 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			pubVersion = "test";
 		} else {
 			pubVersion = releaseVersion;
-		}
-
-		String mavenRepo = System.getenv("mavenRepo");
-		final String repoUrl;
-		if (mavenRepo == null) {
-			repoUrl = String.format("%s/repos", project.getRootDir());
-		} else {
-			repoUrl = mavenRepo;
 		}
 
 		File outputsFolder = project.file(String.format("%s/outputs", buildDir));
@@ -85,6 +78,12 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		// }
 
 		project.afterEvaluate((ae) -> {
+			// Maven repository
+			publishingExtension.getRepositories()
+					.maven((repository) -> {
+						repository.setUrl(vendordepExtension.getReleasesRepoUrl());
+					});
+
 			// Library build plugins
 			if (vendordepExtension.getEnableJava().get()) {
 				project.getPluginManager().apply(VendorToolsJavaPlugin.class);
@@ -92,12 +91,9 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			if (vendordepExtension.getEnableCpp().get()) {
 				project.getPluginManager().apply(VendorToolsCppPlugin.class);
 			}
-
-			// Maven repository
-			publishingExtension.getRepositories()
-					.maven((repository) -> {
-						repository.setUrl(vendordepExtension.getReleasesRepoUrl(repoUrl));
-					});
+			if (vendordepExtension.getEnableCombiner().get()) {
+				project.getPluginManager().apply(VendorToolsCombinerPlugin.class);
+			}
 		});
 	}
 }
