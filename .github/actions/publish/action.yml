@@ -56,5 +56,6 @@ runs:
 
     - name: Publish with Gradle Wrapper
       run: ./gradlew publish
+      shell: bash
       env:
         releasesRepoName: ${{ inputs.maven-repo-name }}
