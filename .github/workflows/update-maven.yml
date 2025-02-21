@@ -16,12 +16,12 @@ on:
       client-payload:
         description: 'The client payload provided by the caller workflow.'
         required: true
-
-secrets:
-  github-token:
-    description: 'The GitHub token used to authenticate with the GitHub API. Must have read access to the repository that you are downloading artifacts from.'
-    required: false
-    type: string
+        type: string
+  
+    secrets:
+      github-token:
+        description: 'The GitHub token used to authenticate with the GitHub API. Must have read access to the repository that you are downloading artifacts from.'
+        required: false
 
 jobs:
   update:
