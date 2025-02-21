@@ -52,7 +52,7 @@ runs:
         pattern: ${{ inputs.artifact-pattern }}
         path: build/products/build/allOutputs
         merge-multiple: true
-        github-token: ${{ secrets.github-token }}
+        github-token: ${{ inputs.github-token }}
 
     - name: Publish with Gradle Wrapper
       run: ./gradlew publish
