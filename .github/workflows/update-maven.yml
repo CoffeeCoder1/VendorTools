@@ -43,7 +43,7 @@ jobs:
           # Set the owner, so the token can be used in all repositories
           owner: ${{ github.repository_owner }}
 
-      - uses: ./.github/actions/publish
+      - uses: CoffeeCoder1/VendorTools/.github/actions/publish@main
         with:
           artifact-pattern: ${{ github.event.client-payload.artifactPattern }}
           artifact-repository: ${{ github.event.client-payload.repositoryName }}
