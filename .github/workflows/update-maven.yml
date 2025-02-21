@@ -49,7 +49,7 @@ jobs:
           artifact-repository: ${{ github.event.client-payload.repositoryName }}
           artifact-run-id: ${{ github.event.client-payload.artifactRunId }}
           maven-repo-name: ${{ github.event.client-payload.mavenName }}
-          github-token: ${{ secrets.github-token }}
+          github-token: ${{ steps.app-token.outputs.token }}
 
       - name: Push updates to Git
         run: |
