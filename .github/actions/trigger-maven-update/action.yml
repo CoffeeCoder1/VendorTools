@@ -1,0 +1,57 @@
+name: 'Trigger Maven Update'
+description: 'Triggers an update of a VendorTools Maven repository.'
+
+inputs:
+  repository-name:
+    description: 'The name of the Github repository to call an update on.'
+    required: true
+    type: string
+
+  maven-name:
+    description: 'The name of the Maven repository subdirectory.'
+    required: true
+    type: string
+
+  artifact-repository-name:
+    description: 'The name of the Github repository to pull build artifacts from. Defaults to this repository.'
+    default: '${{ github.repository }}'
+    required: false
+    type: string
+
+  artifact-run-id:
+    description: 'The ID of the workflow run where the desired download artifact was uploaded from. Defaults to this workflow run.'
+    default: '${{ github.run_id }}'
+    required: false
+    type: string
+
+  artifact-pattern:
+    description: 'A glob pattern to the artifacts that should be downloaded.'
+    default: 'build-outputs-*'
+    required: false
+    type: string
+
+  github-token:
+      description: 'The GitHub token used to authenticate with the GitHub API. Must have write access to the repository that you are calling.'
+      required: true
+      type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Repository Dispatch
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ inputs.github-token }}
+        repository: ${{ inputs.repository-name }}
+        event-type: publish_update
+        client-payload: |
+          {
+            "ref": "${{ github.ref }}",
+            "sha": "${{ github.sha }}",
+            "repositoryName": "${{ inputs.artifact-repository-name }}",
+            "artifactRunId": "${{ inputs.artifact-run-id }}",
+            "artifactPattern": "${{ inputs.artifact-pattern }}",
+            "mavenName": "${{ inputs.maven-name }}",
+            "releaseVersion": "${{ github.ref_name }}"
+          }
+

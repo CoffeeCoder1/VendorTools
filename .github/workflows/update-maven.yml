@@ -1,0 +1,77 @@
+name: Update Maven repository and deploy
+
+on:
+  workflow_call:
+    inputs:
+      git-name:
+        description: 'The name to use for git commits.'
+        required: true
+        type: string
+
+      git-email:
+        description: 'The email to use for git commits.'
+        required: true
+        type: string
+
+      client-payload:
+        description: 'The client payload provided by the caller workflow.'
+        required: true
+
+secrets:
+  github-token:
+    description: 'The GitHub token used to authenticate with the GitHub API. Must have read access to the repository that you are downloading artifacts from.'
+    required: false
+    type: string
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/publish
+        with:
+          artifact-pattern: ${{ inputs.client-payload.artifactPattern }}
+          artifact-repository: ${{ inputs.client-payload.repositoryName }}
+          artifact-run-id: ${{ inputs.client-payload.artifactRunId }}
+          maven-repo-name: ${{ inputs.client-payload.mavenName }}
+          github-token: ${{ secrets.github-token }}
+
+      - name: Push updates to Git
+        run: |
+          git config --global user.name '${{ inputs.git-name }}'
+          git config --global user.email '${{ inputs.git-email }}'
+          git add repos/.
+          git commit -m "Upgrading ${{ inputs.client-payload.repositoryName }} to ${{ inputs.client-payload.releaseVersion }}"
+          git push
+
+      - name: Upload Maven repository as an artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3 # or specific "vX.X.X" version tag for this action
+        with:
+          path: repos/
+
+  deploy-pages:
+    needs: update
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # or specific "vX.X.X" version tag for this action
