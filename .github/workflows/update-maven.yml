@@ -18,6 +18,35 @@ on:
         required: true
         type: string
 
+      maven-name:
+        description: 'The name of the Maven repository subdirectory.'
+        required: true
+        type: string
+
+      artifact-repository:
+        description: 'The GitHub repository to pull build artifacts from. Defaults to this repository.'
+        default: '${{ github.repository }}'
+        required: false
+        type: string
+
+      artifact-run-id:
+        description: 'The ID of the workflow run where the desired download artifact was uploaded from. Defaults to this workflow run.'
+        default: '${{ github.run_id }}'
+        required: false
+        type: string
+
+      artifact-pattern:
+        description: 'A glob pattern to the artifacts that should be downloaded.'
+        default: 'build-outputs-*'
+        required: false
+        type: string
+
+      release-version:
+        description: 'The version of the library to release.'
+        default: '${{ github.ref_name }}'
+        required: false
+        type: string
+
     secrets:
       github-app-private-key:
         description: 'The private key for the GitHub app used to authenticate with the GitHub API. Must have read access to the repository that you are downloading artifacts from.'
@@ -45,10 +74,10 @@ jobs:
 
       - uses: CoffeeCoder1/VendorTools/.github/actions/publish@main
         with:
-          artifact-pattern: ${{ github.event.client-payload.artifactPattern }}
-          artifact-repository: ${{ github.event.client-payload.repositoryName }}
-          artifact-run-id: ${{ github.event.client-payload.artifactRunId }}
-          maven-repo-name: ${{ github.event.client-payload.mavenName }}
+          artifact-pattern: ${{ inputs.artifact-pattern }}
+          artifact-repository: ${{ inputs.artifact-repository }}
+          artifact-run-id: ${{ inputs.artifact-run-id }}
+          maven-repo-name: ${{ inputs.maven-name }}
           github-token: ${{ steps.app-token.outputs.token }}
 
       - name: Push updates to Git
@@ -56,7 +85,7 @@ jobs:
           git config --global user.name '${{ inputs.git-name }}'
           git config --global user.email '${{ inputs.git-email }}'
           git add repos/.
-          git commit -m "Upgrading ${{ inputs.client-payload.repositoryName }} to ${{ inputs.client-payload.releaseVersion }}"
+          git commit -m "Upgrading ${{ inputs.artifact-repository }} to ${{ inputs.release-version }}"
           git push
 
       - name: Upload Maven repository as an artifact
