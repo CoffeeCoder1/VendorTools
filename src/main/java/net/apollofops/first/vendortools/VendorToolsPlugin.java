@@ -41,6 +41,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		String releaseVersion = System.getenv("releaseVersion");
 		final String pubVersion;
 		if (releaseVersion == null) {
+			System.err.println("releaseVersion environment variable not found. Using `test`.");
 			pubVersion = "test";
 		} else {
 			pubVersion = releaseVersion;
