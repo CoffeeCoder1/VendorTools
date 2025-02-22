@@ -39,12 +39,10 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 
 		// Vendordep configuration
 		String releaseVersion = System.getenv("releaseVersion");
-		final String pubVersion;
-		if (releaseVersion == null) {
-			System.err.println("releaseVersion environment variable not found. Using `test`.");
-			pubVersion = "test";
+		if (releaseVersion != null) {
+			project.setVersion(releaseVersion);
 		} else {
-			pubVersion = releaseVersion;
+			System.err.println("releaseVersion environment variable not found. Using the version from the project settings.");
 		}
 
 		File outputsFolder = project.file(String.format("%s/outputs", buildDir));
@@ -53,7 +51,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 
 		// Metadata output
 		WriteProperties writePropertiesTask = project.getTasks().register("outputMetadata", WriteProperties.class, task -> {
-			task.property("pubVersion", pubVersion);
+			task.property("pubVersion", project.getVersion());
 			task.property("releasesRepoName", vendordepExtension.getReleasesRepoName());
 			task.getDestinationFile().set(metadataFile);
 		}).get();
@@ -71,7 +69,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		project.getTasks().register("vendordepJson", VendordepJsonTask.class, task -> {
 			task.getVendordepFile().set(vendordepExtension.getVendordepJsonFile());
 			task.getOutputsFolder().set(outputsFolder);
-			task.getValueMap().put("version", pubVersion);
+			task.getValueMap().put("version", (String) project.getVersion());
 			task.getValueMap().put("groupId", vendordepExtension.getArtifactGroupId());
 			task.getValueMap().put("artifactId", vendordepExtension.getBaseArtifactId());
 		});

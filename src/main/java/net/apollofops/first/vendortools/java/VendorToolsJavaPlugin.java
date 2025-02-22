@@ -37,14 +37,6 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 		Javadoc javadocTask = project.getTasks().withType(Javadoc.class).getByName("javadoc");
 		CopyAllOutputsTask copyAllOutputsTask = project.getTasks().withType(CopyAllOutputsTask.class).getByName("copyAllOutputs");
 
-		String releaseVersion = System.getenv("releaseVersion");
-		final String pubVersion;
-		if (releaseVersion == null) {
-			pubVersion = "test";
-		} else {
-			pubVersion = releaseVersion;
-		}
-
 		Directory buildDir = project.getLayout().getBuildDirectory().get();
 		File outputsFolder = project.file(String.format("%s/outputs", buildDir));
 
@@ -128,7 +120,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 			javaPublication.artifact(javadocJarTask);
 			javaPublication.setArtifactId(String.format("%s-java", vendordepExtension.getBaseArtifactId().get()));
 			javaPublication.setGroupId(vendordepExtension.getArtifactGroupId().get());
-			javaPublication.setVersion(pubVersion);
+			javaPublication.setVersion((String) project.getVersion());
 		});
 	}
 }

@@ -2,14 +2,12 @@ package net.apollofops.first.vendortools.combiner;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Properties;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.provider.Provider;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.Directory;
 import org.gradle.api.publish.PublishingExtension;
@@ -46,6 +44,7 @@ public class VendorToolsCombinerPlugin implements Plugin<Project> {
 			try {
 				metadataProperties.load(new FileInputStream(metadataFile));
 				vendordepExtension.getReleasesRepoName().set((String) metadataProperties.get("releasesRepoName"));
+				project.setVersion(metadataProperties.get("releaseVersion"));
 			} catch (Exception e) {
 				System.err.println(e.getStackTrace());
 			}
@@ -78,7 +77,7 @@ public class VendorToolsCombinerPlugin implements Plugin<Project> {
 						.create(publicationName, MavenPublication.class);
 				publication.setArtifactId(artifactId);
 				publication.setGroupId(groupId.replace("_", "."));
-				publication.setVersion((String) metadataProperties.get("pubVersion"));
+				publication.setVersion((String) project.getVersion());
 			}
 
 			// Add the artifact to the publication
