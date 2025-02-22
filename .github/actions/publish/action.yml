@@ -20,11 +20,6 @@ inputs:
     required: false
     type: string
 
-  maven-repo-name:
-    description: 'The name of the repo subdirectory to put the Maven repo in.'
-    required: true
-    type: string
-
   github-token:
       description: 'The GitHub token used to authenticate with the GitHub API. Must have read access to the repository that you are downloading artifacts from.'
       required: false
@@ -57,5 +52,3 @@ runs:
     - name: Publish with Gradle Wrapper
       run: ./gradlew publish
       shell: bash
-      env:
-        releasesRepoName: ${{ inputs.maven-repo-name }}

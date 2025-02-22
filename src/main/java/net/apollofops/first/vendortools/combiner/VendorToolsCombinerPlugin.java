@@ -1,8 +1,11 @@
 package net.apollofops.first.vendortools.combiner;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Properties;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -14,12 +17,14 @@ import org.gradle.api.publish.maven.MavenArtifact;
 import org.gradle.api.publish.maven.MavenPublication;
 
 import groovy.ant.FileNameFinder;
+import net.apollofops.first.vendortools.VendordepExtension;
 
 public class VendorToolsCombinerPlugin implements Plugin<Project> {
 	@Override
 	public void apply(Project project) {
 		// Extension dependencies
 		PublishingExtension publishingExtension = project.getExtensions().getByType(PublishingExtension.class);
+		VendordepExtension vendordepExtension = project.getExtensions().getByType(VendordepExtension.class);
 
 		// Project info
 		Directory buildDir = project.getLayout().getBuildDirectory().get();
@@ -33,12 +38,18 @@ public class VendorToolsCombinerPlugin implements Plugin<Project> {
 
 		ConfigurableFileCollection allFiles = project.files(zipFiles, jarFiles);
 
-		Provider<String> pubVersion = project.getProviders()
-				.fileContents(project.getLayout()
-						.file(project.provider(() -> project.file(fileFinder.getFileNames(productsFolder.getAbsolutePath(), "**/allOutputs/version.txt")
-								.get(0)))))
-				.getAsText()
-				.map((version) -> version.trim());
+		// Get the metadata for the package
+		File metadataFile = project.file(fileFinder.getFileNames(productsFolder.getAbsolutePath(), "**/allOutputs/metadata.properties")
+				.get(0));
+		Properties metadataProperties = new Properties();
+		if (metadataFile.exists()) {
+			try {
+				metadataProperties.load(new FileInputStream(metadataFile));
+				vendordepExtension.getReleasesRepoName().set((String) metadataProperties.get("releasesRepoName"));
+			} catch (Exception e) {
+				System.err.println(e.getStackTrace());
+			}
+		}
 
 		String regex = "([_M_]*)_GROUP_([^\\.]+)_ID_([^\\.]+)_CLS([^\\.]*).";
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
@@ -67,7 +78,7 @@ public class VendorToolsCombinerPlugin implements Plugin<Project> {
 						.create(publicationName, MavenPublication.class);
 				publication.setArtifactId(artifactId);
 				publication.setGroupId(groupId.replace("_", "."));
-				publication.setVersion(pubVersion.get());
+				publication.setVersion((String) metadataProperties.get("pubVersion"));
 			}
 
 			// Add the artifact to the publication

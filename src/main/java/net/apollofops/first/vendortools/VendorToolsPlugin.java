@@ -8,6 +8,7 @@ import org.gradle.api.Task;
 import org.gradle.api.file.Directory;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
+import org.gradle.api.tasks.WriteProperties;
 
 import net.apollofops.first.vendortools.cpp.VendorToolsCppPlugin;
 import net.apollofops.first.vendortools.java.VendorToolsJavaPlugin;
@@ -47,22 +48,23 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 
 		File outputsFolder = project.file(String.format("%s/outputs", buildDir));
 		File allOutputsFolder = project.file(String.format("%s/allOutputs", buildDir));
-		File versionFile = project.file(String.format("%s/version.txt", outputsFolder));
+		File metadataFile = project.file(String.format("%s/metadata.properties", outputsFolder));
 
-		// Version output
-		project.getTasks().register("outputVersions", OutputVersionsTask.class, task -> {
-			task.getVersion().set(pubVersion);
-			task.getVersionFile().set(versionFile);
-		});
-		buildTask.dependsOn("outputVersions");
+		// Metadata output
+		WriteProperties writePropertiesTask = project.getTasks().register("outputMetadata", WriteProperties.class, task -> {
+			task.property("pubVersion", pubVersion);
+			task.property("releasesRepoName", vendordepExtension.getReleasesRepoName());
+			task.getDestinationFile().set(metadataFile);
+		}).get();
+		buildTask.dependsOn(writePropertiesTask);
 
 		// All outputs task
 		CopyAllOutputsTask copyAllOutputsTask = project.getTasks().register("copyAllOutputs", CopyAllOutputsTask.class, task -> {
-			task.getInputFiles().from(versionFile);
+			task.getInputFiles().from(metadataFile);
 			task.getOutputsFolder().set(allOutputsFolder);
 		}).get();
-		copyAllOutputsTask.dependsOn("outputVersions");
-		buildTask.dependsOn("copyAllOutputs");
+		copyAllOutputsTask.dependsOn(writePropertiesTask);
+		buildTask.dependsOn(copyAllOutputsTask);
 
 		// Vendordep JSON templating
 		project.getTasks().register("vendordepJson", VendordepJsonTask.class, task -> {
@@ -78,12 +80,6 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 		// }
 
 		project.afterEvaluate((ae) -> {
-			// Maven repository
-			publishingExtension.getRepositories()
-					.maven((repository) -> {
-						repository.setUrl(vendordepExtension.getReleasesRepoUrl());
-					});
-
 			// Library build plugins
 			if (vendordepExtension.getEnableJava().get()) {
 				project.getPluginManager().apply(VendorToolsJavaPlugin.class);
@@ -94,6 +90,12 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			if (vendordepExtension.getEnableCombiner().get()) {
 				project.getPluginManager().apply(VendorToolsCombinerPlugin.class);
 			}
+
+			// Maven repository
+			publishingExtension.getRepositories()
+					.maven((repository) -> {
+						repository.setUrl(vendordepExtension.getReleasesRepoUrl());
+					});
 		});
 	}
 }

@@ -7,11 +7,6 @@ inputs:
     required: true
     type: string
 
-  maven-name:
-    description: 'The name of the Maven repository subdirectory.'
-    required: true
-    type: string
-
   artifact-repository-name:
     description: 'The name of the Github repository to pull build artifacts from. Defaults to this repository.'
     default: '${{ github.repository }}'
@@ -51,7 +46,6 @@ runs:
             "repositoryName": "${{ inputs.artifact-repository-name }}",
             "artifactRunId": "${{ inputs.artifact-run-id }}",
             "artifactPattern": "${{ inputs.artifact-pattern }}",
-            "mavenName": "${{ inputs.maven-name }}",
             "releaseVersion": "${{ github.ref_name }}"
           }
 
