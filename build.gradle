@@ -33,3 +33,13 @@ publishing {
         }
     }
 }
+
+// Setup javadoc
+tasks.withType(Javadoc) {
+	options.tags('apiNote:a:API Note:')
+	options.tags('implSpec:a:Implementation Requirements:')
+	options.tags('implNote:a:Implementation Note:')
+	options.setLinks([
+		"https://docs.gradle.org/current/javadoc",
+	])
+}
