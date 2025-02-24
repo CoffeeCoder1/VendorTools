@@ -14,12 +14,21 @@ import net.apollofops.first.vendortools.cpp.VendorToolsCppPlugin;
 import net.apollofops.first.vendortools.java.VendorToolsJavaPlugin;
 import net.apollofops.first.vendortools.combiner.VendorToolsCombinerPlugin;
 
+/**
+ * Main {@link Plugin} of the VendorTools Gradle build tools.
+ */
 public abstract class VendorToolsPlugin implements Plugin<Project> {
 	/**
 	 * The group for the build tasks created by this plugin.
 	 */
 	public static final String BUILD_TASK_GROUP = "Build";
 
+	/**
+	 * Applies the plugin to the given {@link Project}.
+	 *
+	 * @param project
+	 *                {@link Project} to apply the plugin to.
+	 */
 	@Override
 	public void apply(Project project) {
 		// Plugin extension

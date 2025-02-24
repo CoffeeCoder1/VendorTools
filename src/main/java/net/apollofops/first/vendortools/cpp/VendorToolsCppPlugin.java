@@ -13,7 +13,16 @@ import net.apollofops.first.vendortools.CopyAllOutputsTask;
 import net.apollofops.first.vendortools.VendorToolsPlugin;
 import net.apollofops.first.vendortools.VendordepExtension;
 
+/**
+ * {@link Plugin} to facilitate building C++ Vendordeps.
+ */
 public class VendorToolsCppPlugin implements Plugin<Project> {
+	/**
+	 * Applies the plugin to the given {@link Project}.
+	 *
+	 * @param project
+	 *                {@link Project} to apply the plugin to.
+	 */
 	@Override
 	public void apply(Project project) {
 		// Main plugin extension

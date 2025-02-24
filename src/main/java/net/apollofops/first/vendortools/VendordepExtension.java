@@ -9,7 +9,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
 /**
- * An extension used for Vendordep configuration.
+ * An extension used to configure Vendordep builds.
  */
 public class VendordepExtension {
 	/**
@@ -32,8 +32,17 @@ public class VendordepExtension {
 	 * The URL of the maven repo to release to.
 	 */
 	private final Property<String> mavenRepoUrl;
+	/**
+	 * Enables the {@link net.apollofops.first.vendortools.java.VendorToolsJavaPlugin}.
+	 */
 	private final Property<Boolean> enableJava;
+	/**
+	 * Enables the {@link net.apollofops.first.vendortools.cpp.VendorToolsCppPlugin}.
+	 */
 	private final Property<Boolean> enableCpp;
+	/**
+	 * Enables the {@link net.apollofops.first.vendortools.combiner.VendorToolsCombinerPlugin}.
+	 */
 	private final Property<Boolean> enableCombiner;
 
 	/**
@@ -63,34 +72,82 @@ public class VendordepExtension {
 		releasesRepoName.set(System.getenv("releasesRepoName"));
 	}
 
+	/**
+	 * Gets the {@link #vendordepJsonFile}.
+	 *
+	 * @return
+	 *         {@link #vendordepJsonFile} of this extension.
+	 */
 	public RegularFileProperty getVendordepJsonFile() {
 		return vendordepJsonFile;
 	}
 
+	/**
+	 * Gets the {@link #baseArtifactId}.
+	 *
+	 * @return
+	 *         {@link #baseArtifactId} of this extension.
+	 */
 	public Property<String> getBaseArtifactId() {
 		return baseArtifactId;
 	}
 
+	/**
+	 * Gets the {@link #artifactGroupId}.
+	 *
+	 * @return
+	 *         {@link #artifactGroupId} of this extension.
+	 */
 	public Property<String> getArtifactGroupId() {
 		return artifactGroupId;
 	}
 
+	/**
+	 * Gets the {@link #releasesRepoName}.
+	 *
+	 * @return
+	 *         {@link #releasesRepoName} of this extension.
+	 */
 	public Property<String> getReleasesRepoName() {
 		return releasesRepoName;
 	}
 
+	/**
+	 * Gets the {@link #mavenRepoUrl}.
+	 *
+	 * @return
+	 *         {@link #mavenRepoUrl} of this extension.
+	 */
 	public Property<String> getMavenRepoUrl() {
 		return mavenRepoUrl;
 	}
 
+	/**
+	 * Gets the {@link #enableJava}.
+	 *
+	 * @return
+	 *         {@link #enableJava} of this extension.
+	 */
 	public Property<Boolean> getEnableJava() {
 		return enableJava;
 	}
 
+	/**
+	 * Gets the {@link #enableCpp}.
+	 *
+	 * @return
+	 *         {@link #enableCpp} of this extension.
+	 */
 	public Property<Boolean> getEnableCpp() {
 		return enableCpp;
 	}
 
+	/**
+	 * Gets the {@link #enableCombiner}.
+	 *
+	 * @return
+	 *         {@link #enableCombiner} of this extension.
+	 */
 	public Property<Boolean> getEnableCombiner() {
 		return enableCombiner;
 	}

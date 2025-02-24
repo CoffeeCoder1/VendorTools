@@ -17,7 +17,16 @@ import org.gradle.api.publish.maven.MavenPublication;
 import groovy.ant.FileNameFinder;
 import net.apollofops.first.vendortools.VendordepExtension;
 
+/**
+ * {@link Plugin} that combines the outputs from Vendordep builds and publishes them to a Maven repository.
+ */
 public class VendorToolsCombinerPlugin implements Plugin<Project> {
+	/**
+	 * Applies the plugin to the given {@link Project}.
+	 *
+	 * @param project
+	 *                {@link Project} to apply the plugin to.
+	 */
 	@Override
 	public void apply(Project project) {
 		// Extension dependencies

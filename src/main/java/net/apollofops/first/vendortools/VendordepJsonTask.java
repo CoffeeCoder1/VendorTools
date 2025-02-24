@@ -28,10 +28,16 @@ public abstract class VendordepJsonTask extends DefaultTask {
 	 */
 	private final DirectoryProperty outputsFolder;
 	/**
-	 * The values to substitue into the file.
+	 * A map of values to substitue into the file.
 	 */
 	private final MapProperty<String, String> valueMap;
 
+	/**
+	 * Creates a new VendordepJsonTask.
+	 *
+	 * @param objects
+	 *                ObjectFactory used to create properties.
+	 */
 	@Inject
 	public VendordepJsonTask(ObjectFactory objects) {
 		this.vendordepFile = objects.fileProperty();
@@ -39,31 +45,69 @@ public abstract class VendordepJsonTask extends DefaultTask {
 		this.valueMap = objects.mapProperty(String.class, String.class);
 	}
 
+	/**
+	 * Gets the {@link #vendordepFile} for this task.
+	 *
+	 * @return
+	 *         {@link #vendordepFile} for this task.
+	 */
 	@InputFile
 	public RegularFileProperty getVendordepFile() {
 		return vendordepFile;
 	}
 
+	/**
+	 * Gets the {@link #outputsFolder} for this task.
+	 *
+	 * @return
+	 *         {@link #outputsFolder} for this task.
+	 */
 	@OutputDirectory
 	public DirectoryProperty getOutputsFolder() {
 		return outputsFolder;
 	}
 
+	/**
+	 * Gets the {@link #valueMap} for this task.
+	 *
+	 * @return
+	 *         {@link #valueMap} for this task.
+	 */
 	@Input
 	public MapProperty<String, String> getValueMap() {
 		return valueMap;
 	}
 
+	/**
+	 * Gets the description of this task.
+	 *
+	 * @return
+	 *         The description of this task.
+	 */
 	@Override
 	public String getDescription() {
 		return "Builds the vendordep JSON file.";
 	}
 
+	/**
+	 * Gets the group of this task.
+	 *
+	 * @return
+	 *         The group of this task.
+	 */
 	@Override
 	public String getGroup() {
 		return "Build";
 	}
 
+	/**
+	 * Copies the {@link #vendordepFile JSON file} to the {@link #outputsFolder},
+	 * filling in template values from the {@link #valueMap} in the process.
+	 *
+	 * @throws IOException
+	 *                 If an IOException occurs while writing the file.
+	 * @see org.gradle.api.Project#copy(org.gradle.api.Action)
+	 */
 	@TaskAction
 	public void execute() throws IOException {
 		getProject().copy(t -> {
