@@ -2,6 +2,12 @@ name: Build Library - Java
 
 on:
   workflow_call:
+    inputs:
+      release-version:
+        description: 'The version of the library to release.'
+        default: '${{ github.ref_name }}'
+        required: false
+        type: string
 
 jobs:
   build-library:
@@ -27,6 +33,8 @@ jobs:
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build
+        env:
+          releaseVersion: ${{ inputs.release-version }}
 
       - name: Upload build outputs
         uses: actions/upload-artifact@v4.3.1
