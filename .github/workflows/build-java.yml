@@ -9,6 +9,12 @@ on:
         required: false
         type: string
 
+      artifact-name:
+        description: 'The name of the artifact to upload.'
+        default: 'build-outputs-java'
+        required: false
+        type: string
+
 jobs:
   build-library:
     runs-on: ubuntu-latest
@@ -40,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         with:
           # Artifact name
-          name: build-outputs-java
+          name: ${{ inputs.artifact-name }}
           # A file, directory or wildcard pattern that describes what to upload
           path: ./build/allOutputs
           # The desired behavior if no files are found using the provided path.
