@@ -1,9 +1,10 @@
 ---
 layout: default
-title: Setup
+title: Installation
+parent: Setup
 ---
 
-# Setup
+# Installation
 {: .no_toc }
 
 ## Table of Contents
@@ -18,7 +19,7 @@ title: Setup
 
 Installing the plugin is as simple as adding it to your library's `plugins` block and adding a few extra configuration values.
 
-```groovy
+```gradle
 plugins {
     ...
 	id 'net.apollofops.first.VendorTools' version "2025.0.0"
