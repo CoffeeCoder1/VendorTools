@@ -14,4 +14,8 @@ VendorTools is a set of build scripts designed to make creating WPILib Vendor De
 
 * C++ builds
 * JNI builds (probably)
+
+## Things I might add someday
+
 * Python builds
+* Automatic submission of Vendordep updates to the [WPILib Vendor JSON repo](https://github.com/wpilibsuite/vendor-json-repo)
