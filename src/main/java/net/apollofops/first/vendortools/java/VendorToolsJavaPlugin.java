@@ -59,6 +59,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 			task.setGroup(VendorToolsPlugin.BUILD_TASK_GROUP);
 
 			task.getArchiveClassifier().set("sources");
+			task.getArchiveVersion().set("");
 			task.from(mainSourceSet.getAllSource());
 			task.dependsOn(classesTask);
 		}).get();
@@ -68,6 +69,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 			task.setGroup(VendorToolsPlugin.BUILD_TASK_GROUP);
 
 			task.getArchiveClassifier().set("javadoc");
+			task.getArchiveVersion().set("");
 			task.from(javadocTask.getDestinationDir());
 			task.dependsOn(javadocTask);
 		}).get();
@@ -77,6 +79,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 			task.setGroup(VendorToolsPlugin.BUILD_TASK_GROUP);
 
 			task.getArchiveBaseName().set(vendordepExtension.getBaseName("java"));
+			task.getArchiveVersion().set("");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(mainSourceSet.getOutput());
 			task.dependsOn(classesTask);
@@ -88,6 +91,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 
 			task.getArchiveBaseName().set(vendordepExtension.getBaseName("java"));
 			task.getArchiveClassifier().set("sources");
+			task.getArchiveVersion().set("");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(mainSourceSet.getAllSource());
 			task.dependsOn(classesTask);
@@ -99,6 +103,7 @@ public class VendorToolsJavaPlugin implements Plugin<Project> {
 
 			task.getArchiveBaseName().set(vendordepExtension.getBaseName("java"));
 			task.getArchiveClassifier().set("javadoc");
+			task.getArchiveVersion().set("");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(javadocTask.getDestinationDir());
 			task.dependsOn(javadocTask);

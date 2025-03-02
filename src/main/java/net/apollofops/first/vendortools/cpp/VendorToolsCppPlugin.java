@@ -48,6 +48,7 @@ public class VendorToolsCppPlugin implements Plugin<Project> {
 
 			task.getArchiveBaseName().set(vendordepExtension.getBaseName("cpp"));
 			task.getArchiveClassifier().set("headers");
+			task.getArchiveVersion().set("");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(licenseFile);
 			task.from("src/main/native/include");
@@ -60,6 +61,7 @@ public class VendorToolsCppPlugin implements Plugin<Project> {
 
 			task.getArchiveBaseName().set(vendordepExtension.getBaseName("cpp"));
 			task.getArchiveClassifier().set("sources");
+			task.getArchiveVersion().set("");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(licenseFile);
 			task.from("src/main/native/cpp");
@@ -72,6 +74,7 @@ public class VendorToolsCppPlugin implements Plugin<Project> {
 
 			task.getArchiveBaseName().set(vendordepExtension.getBaseName("driver"));
 			task.getArchiveClassifier().set("headers");
+			task.getArchiveVersion().set("");
 			task.getDestinationDirectory().set(outputsFolder);
 			task.from(licenseFile);
 			task.from("src/main/driver/include");
