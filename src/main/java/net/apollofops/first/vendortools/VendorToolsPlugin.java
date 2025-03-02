@@ -83,10 +83,6 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			task.getValueMap().put("artifactId", vendordepExtension.getBaseArtifactId());
 		});
 
-		// clean {
-		// delete releasesRepoUrl
-		// }
-
 		project.afterEvaluate((ae) -> {
 			// Library build plugins
 			if (vendordepExtension.getEnableJava().get()) {
