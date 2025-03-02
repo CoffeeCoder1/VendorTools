@@ -53,7 +53,7 @@ public class VendorToolsCombinerPlugin implements Plugin<Project> {
 			try {
 				metadataProperties.load(new FileInputStream(metadataFile));
 				vendordepExtension.getReleasesRepoName().set((String) metadataProperties.get("releasesRepoName"));
-				project.setVersion(metadataProperties.get("releaseVersion"));
+				project.setVersion(metadataProperties.get("pubVersion"));
 			} catch (Exception e) {
 				System.err.println(e.getStackTrace());
 			}
