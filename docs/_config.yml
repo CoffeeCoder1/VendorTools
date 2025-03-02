@@ -3,6 +3,7 @@ description: Documentation for the VendorTools build tools.
 theme: just-the-docs
 
 url: https://CoffeeCoder1.github.io/VendorTools
+github_url: https://github.com/CoffeeCoder1/VendorTools
 
 aux_links:
   Repository: https://github.com/CoffeeCoder1/VendorTools
