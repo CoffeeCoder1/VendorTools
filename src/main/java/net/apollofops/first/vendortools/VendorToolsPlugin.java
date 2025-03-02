@@ -22,6 +22,14 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 	 * The group for the build tasks created by this plugin.
 	 */
 	public static final String BUILD_TASK_GROUP = "Build";
+	/**
+	 * The key used for the version in the metadata file.
+	 */
+	public static final String METADATA_VERSION_KEY = "pubVersion";
+	/**
+	 * The key used for the releases repo name in the metadata file.
+	 */
+	public static final String METADATA_RELEASES_REPO_NAME_KEY = "releasesRepoName";
 
 	/**
 	 * Applies the plugin to the given {@link Project}.
@@ -60,8 +68,8 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 
 		// Metadata output
 		WriteProperties writePropertiesTask = project.getTasks().register("outputMetadata", WriteProperties.class, task -> {
-			task.property("pubVersion", project.getVersion());
-			task.property("releasesRepoName", vendordepExtension.getReleasesRepoName());
+			task.property(METADATA_VERSION_KEY, project.getVersion());
+			task.property(METADATA_RELEASES_REPO_NAME_KEY, vendordepExtension.getReleasesRepoName());
 			task.getDestinationFile().set(metadataFile);
 		}).get();
 		buildTask.dependsOn(writePropertiesTask);

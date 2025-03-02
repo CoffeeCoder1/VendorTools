@@ -15,6 +15,7 @@ import org.gradle.api.publish.maven.MavenArtifact;
 import org.gradle.api.publish.maven.MavenPublication;
 
 import groovy.ant.FileNameFinder;
+import net.apollofops.first.vendortools.VendorToolsPlugin;
 import net.apollofops.first.vendortools.VendordepExtension;
 
 /**
@@ -52,8 +53,8 @@ public class VendorToolsCombinerPlugin implements Plugin<Project> {
 		if (metadataFile.exists()) {
 			try {
 				metadataProperties.load(new FileInputStream(metadataFile));
-				vendordepExtension.getReleasesRepoName().set((String) metadataProperties.get("releasesRepoName"));
-				project.setVersion(metadataProperties.get("pubVersion"));
+				vendordepExtension.getReleasesRepoName().set((String) metadataProperties.get(VendorToolsPlugin.METADATA_RELEASES_REPO_NAME_KEY));
+				project.setVersion(metadataProperties.get(VendorToolsPlugin.METADATA_VERSION_KEY));
 			} catch (Exception e) {
 				System.err.println(e.getStackTrace());
 			}
