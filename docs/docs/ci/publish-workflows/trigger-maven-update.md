@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Publish
+title: Trigger Maven Update
 parent: Publish Workflows
 ---
 
