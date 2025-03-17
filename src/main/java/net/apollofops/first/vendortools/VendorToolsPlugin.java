@@ -6,7 +6,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.Directory;
-import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 import org.gradle.api.tasks.WriteProperties;
 
@@ -35,7 +34,7 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 	 * Applies the plugin to the given {@link Project}.
 	 *
 	 * @param project
-	 *                {@link Project} to apply the plugin to.
+	 *            {@link Project} to apply the plugin to.
 	 */
 	@Override
 	public void apply(Project project) {
@@ -44,9 +43,6 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 
 		// Plugin dependencies
 		project.getPluginManager().apply(MavenPublishPlugin.class);
-
-		// Extension dependencies
-		PublishingExtension publishingExtension = project.getExtensions().getByType(PublishingExtension.class);
 
 		// Task dependencies
 		Task buildTask = project.getTasks().getByName("build");
@@ -102,12 +98,6 @@ public abstract class VendorToolsPlugin implements Plugin<Project> {
 			if (vendordepExtension.getEnableCombiner().get()) {
 				project.getPluginManager().apply(VendorToolsCombinerPlugin.class);
 			}
-
-			// Maven repository
-			publishingExtension.getRepositories()
-					.maven((repository) -> {
-						repository.setUrl(vendordepExtension.getReleasesRepoUrl());
-					});
 		});
 	}
 }
