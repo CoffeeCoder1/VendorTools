@@ -9,7 +9,7 @@ java {
 }
 
 group = 'net.apollofops'
-version = '2025.1.1'
+version = '2025.1.2'
 
 gradlePlugin {
 	website = 'https://coffeecoder1.github.io/VendorTools/'
