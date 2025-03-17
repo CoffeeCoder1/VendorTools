@@ -45,8 +45,8 @@ runs:
         repository: ${{ inputs.artifact-repository }}
         run-id: ${{ inputs.artifact-run-id }}
         pattern: ${{ inputs.artifact-pattern }}
-        path: build/products/build/allOutputs
-        merge-multiple: true
+        path: build/products
+        merge-multiple: false
         github-token: ${{ inputs.github-token }}
 
     - name: Publish with Gradle Wrapper
